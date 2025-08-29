@@ -1,15 +1,19 @@
 
 import Navbar from './components/Navbar.jsx'
 import './App.css'
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/Home.jsx"
+import Menu from "./pages/Menu.jsx"
 
 function App() {
 
   return (
     <>
       <Navbar/>
-      <div className='p-6'>
-        <h2 className='text-xl'>Welcome to QuickEats 🍔</h2>
-      </div>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/menu" element={<Menu />} />
+      </Routes>
     </>
   )
 }
