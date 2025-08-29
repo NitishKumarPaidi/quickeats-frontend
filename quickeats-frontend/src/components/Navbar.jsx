@@ -19,6 +19,8 @@ export default function Navbar() {
           )}
         </li>
         <li><Link to="/login" className="hover:text-red-500">Login</Link></li>
+        <li><Link to="/signup" className="hover:text-red-500">Signup</Link></li>
+
       </ul>
     </nav>
   );
