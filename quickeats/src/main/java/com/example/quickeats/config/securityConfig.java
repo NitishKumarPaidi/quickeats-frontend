@@ -16,6 +16,9 @@ public class securityConfig {
                 .csrf(csrf -> csrf.disable()) // allow POST requests without CSRF token
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/api/users/signup", "/api/users/login").permitAll()
+                        .requestMatchers("/api/menu").permitAll()
+                        .requestMatchers("/api/menu/**").permitAll()
+                        .requestMatchers("/").permitAll()
                         .anyRequest().authenticated());
 
         return http.build();
