@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api";
+import axios from "axios";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -11,13 +11,21 @@ export default function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await api.post("/signup", { name, email, password });
-      localStorage.setItem("token", `Bearer ${res.data.token}`);
-      localStorage.setItem("name", res.data.name); // store user's name
-      navigate("/menu"); // redirect after signup
+      await axios.post("http://localhost:8080/api/users/signup", { name, email, password });
+
+      // After signup, auto-login
+      const res = await axios.post("http://localhost:8080/api/users/login", { email, password });
+      const token = res.data;
+      localStorage.setItem("token", token);
+      localStorage.setItem("name", name);
+
+      setError("");
+      navigate("/menu"); // redirect after signup & login
     } catch (err) {
-      setError(err.response?.data?.message || "Signup failed");
+      console.error(err);
+      setError("Signup failed. Try again.");
     }
   };
 
@@ -31,24 +39,24 @@ export default function Signup() {
           placeholder="Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full p-2 border rounded"
           required
+          className="w-full p-2 border rounded"
         />
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 border rounded"
           required
+          className="w-full p-2 border rounded"
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 border rounded"
           required
+          className="w-full p-2 border rounded"
         />
         <button type="submit" className="w-full bg-green-500 text-white p-2 rounded">
           Signup

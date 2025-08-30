@@ -1,65 +1,56 @@
 import { useEffect, useState } from "react";
-import api from "../api";
+import axios from "axios";
 
 export default function Cart() {
   const [cart, setCart] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchCart = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await api.get("/cart", {
-          headers: { Authorization: `Bearer ${token}` }
+        const res = await axios.get("http://localhost:8080/api/cart", {
+          headers: { Authorization: token },
         });
         setCart(res.data);
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch cart");
+        console.error(err);
+        setError("Failed to load cart.");
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchCart();
   }, []);
 
-  const increment = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-      await api.put(`/cart/${id}/increment`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setCart(cart.map(item => item.id === id ? { ...item, quantity: item.quantity + 1 } : item));
-    } catch (err) {
-      setError("Failed to update item");
-    }
+  const increment = (id) => {
+    setCart(cart.map(item =>
+      item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+    ));
   };
 
-  const decrement = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-      await api.put(`/cart/${id}/decrement`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setCart(cart.map(item => item.id === id && item.quantity > 1 ? { ...item, quantity: item.quantity - 1 } : item));
-    } catch (err) {
-      setError("Failed to update item");
-    }
+  const decrement = (id) => {
+    setCart(cart.map(item =>
+      item.id === id && item.quantity > 1
+        ? { ...item, quantity: item.quantity - 1 }
+        : item
+    ));
   };
 
-  const removeItem = async (id) => {
-    try {
-      const token = localStorage.getItem("token");
-      await api.delete(`/cart/${id}`, { headers: { Authorization: `Bearer ${token}` } });
-      setCart(cart.filter(item => item.id !== id));
-    } catch (err) {
-      setError("Failed to remove item");
-    }
+  const removeItem = (id) => {
+    setCart(cart.filter(item => item.id !== id));
   };
 
   const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
+  if (loading) return <p className="p-6">Loading cart...</p>;
+  if (error) return <p className="p-6 text-red-500">{error}</p>;
+
   return (
     <div className="p-6">
       <h2 className="text-2xl font-bold mb-6">Your Cart 🛒</h2>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
       {cart.length === 0 ? (
         <p className="text-gray-500">Your cart is empty.</p>
       ) : (

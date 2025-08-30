@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import api from "../api"; // Make sure this exists: src/api/axios.js
+import axios from "axios";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,14 +10,20 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await api.post("/login", { email, password });
-      localStorage.setItem("token", `Bearer ${res.data.token}`);
-      localStorage.setItem("name", res.data.name); // store user's name
+      // 1️⃣ Login and get token
+      const res = await axios.post("http://localhost:8080/api/users/login", { email, password });
+      const {token,name} = res.data; // "Bearer <token>"
+      localStorage.setItem("token", token);
+
+      
+      localStorage.setItem("name", name);
+      
       navigate("/menu"); // redirect after login
     } catch (err) {
-      console.error(err.response);
-      setError(err.response?.data?.message || "Login failed");
+      console.error(err);
+      setError("Login failed. Check your email and password.");
     }
   };
 
@@ -31,16 +37,16 @@ export default function Login() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full p-2 border rounded"
           required
+          className="w-full p-2 border rounded"
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="w-full p-2 border rounded"
           required
+          className="w-full p-2 border rounded"
         />
         <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
           Login
