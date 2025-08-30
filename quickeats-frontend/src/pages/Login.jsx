@@ -14,12 +14,12 @@ export default function Login() {
     try {
       // 1️⃣ Login and get token
       const res = await axios.post("http://localhost:8080/api/users/login", { email, password });
-      const {token,name} = res.data; // "Bearer <token>"
+      const {token, name} = res.data; // "Bearer <token>"
       localStorage.setItem("token", token);
 
       
-      localStorage.setItem("name", name);
-      
+      localStorage.setItem("name",name);
+    
       navigate("/menu"); // redirect after login
     } catch (err) {
       console.error(err);

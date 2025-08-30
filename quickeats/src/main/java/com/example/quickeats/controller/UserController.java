@@ -39,8 +39,10 @@ public class UserController {
 
             // Simple password check (later we will encrypt passwords)
             if (user.getPassword().equals(loginRequest.getPassword())) {
-                System.out.println("Login attempt: " + loginRequest.getEmail() + " / " + loginRequest.getPassword());
-                userOpt.ifPresent(u -> System.out.println("Found user: " + u.getEmail() + " / " + u.getPassword()));
+                // System.out.println("Login attempt: " + loginRequest.getEmail() + " / " +
+                // loginRequest.getPassword());
+                // userOpt.ifPresent(u -> System.out.println("Found user: " + u.getEmail() + " /
+                // " + u.getPassword()));
 
                 String token = JwtUtil.generateToken(user.getEmail());
                 return ResponseEntity.ok(Map.of(
