@@ -3,7 +3,7 @@ package com.example.quickeats.model;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication(scanBasePackages = "com.example.quickeats")
+@SpringBootApplication
 public class Application {
 
 	public static void main(String[] args) {
