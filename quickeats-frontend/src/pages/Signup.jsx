@@ -1,96 +1,56 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api";
 
 export default function Signup() {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [errors, setErrors] = useState({});
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let newErrors = {};
-
-    if (!form.name) newErrors.name = "Name is required";
-    if (!form.email) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(form.email)) newErrors.email = "Invalid email";
-
-    if (!form.password) newErrors.password = "Password is required";
-    else if (form.password.length < 6)
-      newErrors.password = "Min 6 characters";
-
-    if (form.password !== form.confirmPassword)
-      newErrors.confirmPassword = "Passwords do not match";
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      alert("Signup successful (dummy)");
+    try {
+      const res = await api.post("/signup", { name, email, password });
+      localStorage.setItem("token", `Bearer ${res.data.token}`);
+      localStorage.setItem("name", res.data.name); // store user's name
+      navigate("/menu"); // redirect after signup
+    } catch (err) {
+      setError(err.response?.data?.message || "Signup failed");
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white shadow-md rounded-lg p-6 w-96"
-      >
-        <h2 className="text-2xl font-bold mb-4 text-center">Signup</h2>
-
-        <label className="block mb-2">Name</label>
+    <div className="p-6 max-w-md mx-auto">
+      <h2 className="text-2xl font-bold mb-4">Signup</h2>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
-          name="name"
-          className="w-full border rounded px-3 py-2 mb-2"
-          value={form.name}
-          onChange={handleChange}
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          className="w-full p-2 border rounded"
+          required
         />
-        {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-
-        <label className="block mb-2 mt-3">Email</label>
         <input
           type="email"
-          name="email"
-          className="w-full border rounded px-3 py-2 mb-2"
-          value={form.email}
-          onChange={handleChange}
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="w-full p-2 border rounded"
+          required
         />
-        {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-
-        <label className="block mb-2 mt-3">Password</label>
         <input
           type="password"
-          name="password"
-          className="w-full border rounded px-3 py-2 mb-2"
-          value={form.password}
-          onChange={handleChange}
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className="w-full p-2 border rounded"
+          required
         />
-        {errors.password && (
-          <p className="text-red-500 text-sm">{errors.password}</p>
-        )}
-
-        <label className="block mb-2 mt-3">Confirm Password</label>
-        <input
-          type="password"
-          name="confirmPassword"
-          className="w-full border rounded px-3 py-2 mb-2"
-          value={form.confirmPassword}
-          onChange={handleChange}
-        />
-        {errors.confirmPassword && (
-          <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
-        )}
-
-        <button
-          type="submit"
-          className="bg-red-500 text-white w-full py-2 rounded mt-4 hover:bg-red-600"
-        >
+        <button type="submit" className="w-full bg-green-500 text-white p-2 rounded">
           Signup
         </button>
       </form>

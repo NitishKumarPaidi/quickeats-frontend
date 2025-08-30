@@ -1,59 +1,48 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api"; // Make sure this exists: src/api/axios.js
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState({});
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    let newErrors = {};
-
-    if (!email) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = "Invalid email";
-
-    if (!password) newErrors.password = "Password is required";
-    else if (password.length < 6) newErrors.password = "Min 6 characters";
-
-    setErrors(newErrors);
-
-    if (Object.keys(newErrors).length === 0) {
-      alert("Login successful (dummy)");
+    try {
+      const res = await api.post("/login", { email, password });
+      localStorage.setItem("token", `Bearer ${res.data.token}`);
+      localStorage.setItem("name", res.data.name); // store user's name
+      navigate("/menu"); // redirect after login
+    } catch (err) {
+      console.error(err.response);
+      setError(err.response?.data?.message || "Login failed");
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white shadow-md rounded-lg p-6 w-96"
-      >
-        <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
-
-        <label className="block mb-2">Email</label>
+    <div className="p-6 max-w-md mx-auto">
+      <h2 className="text-2xl font-bold mb-4">Login</h2>
+      {error && <p className="text-red-500 mb-4">{error}</p>}
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="email"
-          className="w-full border rounded px-3 py-2 mb-2"
+          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          className="w-full p-2 border rounded"
+          required
         />
-        {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
-
-        <label className="block mb-2 mt-3">Password</label>
         <input
           type="password"
-          className="w-full border rounded px-3 py-2 mb-2"
+          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          className="w-full p-2 border rounded"
+          required
         />
-        {errors.password && (
-          <p className="text-red-500 text-sm">{errors.password}</p>
-        )}
-
-        <button
-          type="submit"
-          className="bg-red-500 text-white w-full py-2 rounded mt-4 hover:bg-red-600"
-        >
+        <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">
           Login
         </button>
       </form>
