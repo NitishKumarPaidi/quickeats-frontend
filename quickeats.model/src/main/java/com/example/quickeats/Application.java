@@ -1,4 +1,4 @@
-package com.example.quickeats.model;
+package com.example.quickeats;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
