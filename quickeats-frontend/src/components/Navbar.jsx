@@ -1,27 +1,46 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function Navbar() {
-  const [cartCount] = useState(2); // later will connect to global state
+const Navbar = () => {
+  const navigate = useNavigate();
+  const name = localStorage.getItem("name");
+
+  const handleLogout = () => {
+    localStorage.clear();
+    navigate("/login");
+  };
 
   return (
-    <nav className="bg-white shadow-md px-6 py-4 flex justify-between items-center">
-      <h1 className="text-2xl font-bold text-red-500">QuickEats</h1>
-      <ul className="flex space-x-6">
-        <li><Link to="/" className="hover:text-red-500">Home</Link></li>
-        <li><Link to="/menu" className="hover:text-red-500">Menu</Link></li>
-        <li className="relative">
-          <Link to="/cart" className="hover:text-red-500">Cart</Link>
-          {cartCount > 0 && (
-            <span className="absolute -top-2 -right-3 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
-              {cartCount}
-            </span>
-          )}
-        </li>
-        <li><Link to="/login" className="hover:text-red-500">Login</Link></li>
-        <li><Link to="/signup" className="hover:text-red-500">Signup</Link></li>
-
-      </ul>
+    <nav className="flex justify-between items-center px-6 py-4 bg-white shadow">
+      <h1 className="text-2xl font-bold">QuickEats</h1>
+      <div className="flex gap-6 items-center">
+        <Link to="/menu">Menu</Link>
+        <Link to="/cart">Cart</Link>
+        {name ? (
+          <>
+            <span>Hi, {name}</span>
+            <button
+              onClick={handleLogout}
+              className="text-red-500 font-medium ml-4"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <Link to="/login">Login</Link>
+            <Link
+                to="/signup"
+                className="bg-blue-500 text-white px-3 py-1 rounded"
+              >
+                Signup
+            </Link>
+          </>
+        )
+        }
+      </div>
     </nav>
   );
-}
+};
+
+export default Navbar;

@@ -23,7 +23,7 @@ public class securityConfig {
                 .and()
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/api/users/signup", "/api/users/login").permitAll()
-                        .requestMatchers("/api/menu", "/api/menu/**").permitAll()
+                        .requestMatchers("/api/**", "/api/menu", "/api/menu/**").permitAll()
                         .anyRequest().authenticated());
 
         return http.build();

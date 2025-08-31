@@ -1,7 +1,10 @@
 package com.example.quickeats.service;
 
+import com.example.quickeats.dto.AddToCartRequest;
 import com.example.quickeats.model.CartItem;
+import com.example.quickeats.model.Menu;
 import com.example.quickeats.repository.CartRepository;
+import com.example.quickeats.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,12 +15,23 @@ import java.util.List;
 public class CartService {
 
     private final CartRepository cartRepository;
+    private final MenuRepository menuRepository;
 
     public List<CartItem> getCartItems(Long userId) {
         return cartRepository.findByUserId(userId);
     }
 
-    public CartItem addItem(CartItem item) {
+    public CartItem addItem(AddToCartRequest request) {
+        var menu = menuRepository.findById(request.getMenuId())
+                .orElseThrow(() -> new RuntimeException("Menu item not found"));
+
+        CartItem item = new CartItem();
+        item.setUserId(request.getUserId());
+        item.setMenuItemId(menu.getId());
+        item.setName(menu.getName());
+        item.setPrice(menu.getPrice());
+        item.setQuantity(request.getQuantity());
+
         return cartRepository.save(item);
     }
 

@@ -1,5 +1,6 @@
 package com.example.quickeats.controller;
 
+import com.example.quickeats.dto.AddToCartRequest;
 import com.example.quickeats.model.CartItem;
 import com.example.quickeats.service.CartService;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +24,9 @@ public class CartController {
     }
 
     @PostMapping
-    public CartItem addItem(@RequestBody CartItem item) {
-        return cartService.addItem(item);
+    public CartItem addItem(@RequestBody AddToCartRequest request) {
+        System.out.println("➡️ AddToCartRequest: " + request);
+        return cartService.addItem(request);
     }
 
     @PutMapping("/{id}")

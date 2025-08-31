@@ -1,67 +1,81 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-export default function Signup() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+const Signup = () => {
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
   const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      await axios.post("http://localhost:8080/api/users/signup", { name, email, password });
-
-      // After signup, auto-login
-      const res = await axios.post("http://localhost:8080/api/users/login", { email, password });
-      const token = res.data;
-      localStorage.setItem("token", token);
-      localStorage.setItem("name", name);
-
-      setError("");
-      navigate("/menu"); // redirect after signup & login
+      await axios.post("http://localhost:8080/api/users/signup", form);
+      alert("Signup successful! Please login.");
+      navigate("/login");
     } catch (err) {
-      console.error(err);
-      setError("Signup failed. Try again.");
+      alert(err, "Signup failed. Try again.");
     }
   };
 
   return (
-    <div className="p-6 max-w-md mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Signup</h2>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="flex justify-center items-center h-screen bg-gray-100">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-6 rounded shadow w-96"
+      >
+        <h2 className="text-xl font-bold mb-4">Signup</h2>
         <input
           type="text"
+          name="name"
           placeholder="Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={form.name}
+          onChange={handleChange}
+          className="w-full border p-2 mb-3"
           required
-          className="w-full p-2 border rounded"
         />
         <input
           type="email"
+          name="email"
           placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={form.email}
+          onChange={handleChange}
+          className="w-full border p-2 mb-3"
           required
-          className="w-full p-2 border rounded"
         />
         <input
           type="password"
+          name="password"
           placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={form.password}
+          onChange={handleChange}
+          className="w-full border p-2 mb-3"
           required
-          className="w-full p-2 border rounded"
         />
-        <button type="submit" className="w-full bg-green-500 text-white p-2 rounded">
+        <button
+          type="submit"
+          className="w-full bg-blue-500 text-white py-2 rounded"
+        >
           Signup
         </button>
+
+
+        <p className="text-sm mt-3">
+          I already have an account?{" "}
+          <span
+            className="text-blue-500 cursor-pointer"
+            onClick={() => navigate("/login")}
+          >
+            login
+          </span>
+        </p>
+
       </form>
     </div>
   );
-}
+};
+
+export default Signup;

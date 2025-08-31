@@ -32,44 +32,34 @@ public class UserController {
     // Login API
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        // System.out.println("Login attempt: " + loginRequest.getEmail() + " / " +
+        // loginRequest.getPassword());
         Optional<User> userOpt = userRepository.findByEmail(loginRequest.getEmail());
 
         if (userOpt.isPresent()) {
             User user = userOpt.get();
+            // System.out.println("Found user: " + user.getEmail() + " / " +
+            // user.getPassword());
 
             // Simple password check (later we will encrypt passwords)
             if (user.getPassword().equals(loginRequest.getPassword())) {
-                // System.out.println("Login attempt: " + loginRequest.getEmail() + " / " +
-                // loginRequest.getPassword());
-                // userOpt.ifPresent(u -> System.out.println("Found user: " + u.getEmail() + " /
-                // " + u.getPassword()));
 
                 String token = JwtUtil.generateToken(user.getEmail());
+                // System.out.println("✅ Password matched. Returning token.");
                 return ResponseEntity.ok(Map.of(
-                        "token", "Bearer " + token,
-                        "name", user.getName()));
+                        "token", token,
+                        "name", user.getName(),
+                        "id", user.getId()));
             }
+            // else {
+            // System.out.println("❌ Password mismatch");
+            // }
         }
+        // else {
+        // System.out.println("❌ User not found");
+        // }
 
         return ResponseEntity.status(401).body("Invalid email or password");
     }
-
-    // // Get current logged-in user info (using JWT)
-    // @GetMapping("/me")
-    // public ResponseEntity<?> getCurrentUser(@RequestHeader("Authorization")
-    // String authHeader) {
-    // try {
-    // String token = authHeader.replace("Bearer ", "");
-    // String email = JwtUtil.validateToken(token);
-    // Optional<User> userOpt = userRepository.findByEmail(email);
-    // if (userOpt.isPresent()) {
-    // return ResponseEntity.ok(userOpt.get());
-    // } else {
-    // return ResponseEntity.status(404).body("User not found");
-    // }
-    // } catch (Exception e) {
-    // return ResponseEntity.status(401).body("Invalid token");
-    // }
-    // }
 
 }
